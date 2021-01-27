@@ -14,8 +14,8 @@ public class Application {
 				.run(Application.class, args);
 		final CommandSender commandSender = context
 				.getBean(CommandSender.class);
-		commandSender.send(new Command(UUID.randomUUID(), "commit !"), true);
-		commandSender.send(new Command(null, "bad !"), true);
-		commandSender.send(new Command(UUID.randomUUID(), "rollback !"), false);
+		commandSender.sendToQueue(new Command(UUID.randomUUID(), "queue !"));
+		commandSender.sendToTopic(new Command(UUID.randomUUID(), "topic !"));
+		// false);
 	}
 }

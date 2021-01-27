@@ -12,14 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @Validated
-public class CommandReceiver {
-	@JmsListener(destination = "${queue}", containerFactory = "queueConnectionFactory")
-	public void receiveFromQueue(final @Payload @Valid Command cmd) {
-		CommandReceiver.log.info("receive from queue {}", cmd);
-	}
-
+public class CommandReceiver2 {
 	@JmsListener(destination = "${topic}", containerFactory = "topicConnectionFactory")
 	public void receiveFromTopic(final @Payload @Valid Command cmd) {
-		CommandReceiver.log.info("receive from topic {}", cmd);
+		CommandReceiver2.log.info("receive from topic {}", cmd);
 	}
 }

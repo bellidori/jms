@@ -1,8 +1,12 @@
 package com.example.demo;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Session;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -13,28 +17,35 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
+import org.springframework.jms.support.destination.DynamicDestinationResolver;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableJms
 @EnableTransactionManagement
-public class MessagingConfig {
+public class JmsConfig {
 	@Autowired
 	private ConnectionFactory connectionFactory;
 
 	@Bean
-	public JmsListenerContainerFactory<?> containerFactory() {
-		/*
-		 * final ConnectionFactory connectionFactory, final
-		 * DefaultJmsListenerContainerFactoryConfigurer configurer) { final
-		 * DefaultJmsListenerContainerFactory factory = new
-		 * DefaultJmsListenerContainerFactory(); // This provides all boot's
-		 * default to this factory, including the // message converter
-		 * configurer.configure(factory, connectionFactory); configurer. // You
-		 * could still override some of Boot's default if necessary.
-		 */
+	public JmsListenerContainerFactory<?> queueConnectionFactory(
+			final ConnectionFactory connectionFactory,
+			final DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		final DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-		factory.setConnectionFactory(this.connectionFactory);
+		configurer.configure(factory, connectionFactory);
+		factory.setPubSubDomain(false);
+		factory.setErrorHandler(new DefaultErrorHandler());
+		factory.setMessageConverter(this.messageConverter());
+		return factory;
+	}
+
+	@Bean
+	public JmsListenerContainerFactory<?> topicConnectionFactory(
+			final ConnectionFactory connectionFactory,
+			final DefaultJmsListenerContainerFactoryConfigurer configurer) {
+		final DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+		configurer.configure(factory, connectionFactory);
+		factory.setPubSubDomain(true);
 		factory.setErrorHandler(new DefaultErrorHandler());
 		factory.setMessageConverter(this.messageConverter());
 		return factory;
@@ -57,5 +68,21 @@ public class MessagingConfig {
 		// manager
 		tm.setConnectionFactory(jmsTemplate.getConnectionFactory());
 		return tm;
+	}
+
+	@Bean
+	public DynamicDestinationResolver destinationResolver() {
+		return new DynamicDestinationResolver() {
+			@Override
+			public Destination resolveDestinationName(final Session session,
+					final String destinationName, boolean pubSubDomain)
+					throws JMSException {
+				if (destinationName.contains("TOPIC")) {
+					pubSubDomain = true;
+				}
+				return super.resolveDestinationName(session, destinationName,
+						pubSubDomain);
+			}
+		};
 	}
 }
