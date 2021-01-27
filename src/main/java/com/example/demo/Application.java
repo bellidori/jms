@@ -14,8 +14,10 @@ public class Application {
 				.run(Application.class, args);
 		final CommandSender commandSender = context
 				.getBean(CommandSender.class);
-		commandSender.sendToQueue(new Command(UUID.randomUUID(), "queue !"));
-		commandSender.sendToTopic(new Command(UUID.randomUUID(), "topic !"));
-		// false);
+		commandSender.sendToQueue(new Command1(UUID.randomUUID(), "queue !"));
+		// commandSender.sendToQueue(new Command1(null, "queue !"));
+		commandSender.sendToTopic(new Command1(UUID.randomUUID(), "topic !"));
+		// commandSender.sendToTopic(new Command1(null, "topic !"));
+		commandSender.sendToTopic(new Command2(UUID.randomUUID(), "topic !"));
 	}
 }

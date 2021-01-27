@@ -30,7 +30,7 @@ public class CommandSender {
 	 * @param cmd command to send
 	 * @param commit commit
 	 */
-	public void sendToQueue(final Command cmd) {
+	public void sendToQueue(final Command1 cmd) {
 		CommandSender.log.debug("prepare sending {} on {}", cmd, this.qName);
 		// This starts a new transaction scope. "null" can be used to get a
 		// default transaction model
@@ -46,7 +46,23 @@ public class CommandSender {
 	 * @param cmd command to send
 	 * @param commit commit
 	 */
-	public void sendToTopic(final Command cmd) {
+	public void sendToTopic(final Command1 cmd) {
+		CommandSender.log.debug("prepare sending {} on {}", cmd, this.qName);
+		// This starts a new transaction scope. "null" can be used to get a
+		// default transaction model
+		final TransactionStatus status = this.tm.getTransaction(null);
+		// This operation will be made part of the transaction that we
+		// initiated.
+		this.jmsTemplate.convertAndSend(this.topic, cmd);
+		this.tm.commit(status);
+	}
+
+	/**
+	 * send command to queue.
+	 * @param cmd command to send
+	 * @param commit commit
+	 */
+	public void sendToTopic(final Command2 cmd) {
 		CommandSender.log.debug("prepare sending {} on {}", cmd, this.qName);
 		// This starts a new transaction scope. "null" can be used to get a
 		// default transaction model

@@ -1,0 +1,66 @@
+ibm:
+  mq:
+    channel: DEV.ADMIN.SVRCONN
+    connName: localhost(1414)
+    password: passw0rd
+    queueManager: QM1
+    user: admin
+logging:
+  level:
+    com:
+      example:
+        demo: DEBUG
+    org:
+      springframework: INFO
+    root: ERROR
+  pattern:
+    level: '%5p [${spring.zipkin.service.name:${spring.application.name:-}},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}]'
+management:
+  endpoint:
+    caches:
+      enabled: true
+    env:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+    info:
+      enabled: true
+    loggers:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    enabled-by-default: true
+    jmx:
+      exposure:
+        include: '*'
+    web:
+      exposure:
+        include: info,health
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+queue: DEV.QUEUE.1
+spring:
+  application:
+    name: poc mq
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    deserialization:
+      adjust-dates-to-context-time-zone: true
+      read-date-timestamps-as-nanoseconds: true
+      read-enums-using-to-string: false
+      read-unknown-enum-values-using-default-value: true
+    serialization:
+      write-date-timestamps-as-nanoseconds: true
+      write-dates-as-timestamps: false
+      write-dates-with-zone-id: true
+      write-enums-using-to-string: false
+    time-zone: Europe/Paris
+  jms:
+    isPubSubDomain: true
+topic: DEV.BASE.TOPIC
